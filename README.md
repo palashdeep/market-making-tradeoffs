@@ -55,11 +55,11 @@ Only **controlled PnL** is used for optimization and evaluation, since MTM domin
 Experiments are performed via a single runner script -  `run_experiment.py`. Each parameter set is evaluated across many independent price paths
 
 For each set, we compute:
-    - mean controlled PnL
-    - standard deviation of PnL
-    - t-statistic
-    - mean inventory volatility
-    - mean hedge cost
+- mean controlled PnL
+- standard deviation of PnL
+- t-statistic
+- mean inventory volatility
+- mean hedge cost
 
 A parameter set is considered statistically meaningful only if:
 ```perl
