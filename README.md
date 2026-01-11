@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project studies market maker's tradeoff between **spread capture**, **inventory risk** and **hedging cost** in a noisy and uncertain market environment
+This project studies a market maker's tradeoff between **spread capture**, **inventory risk**, and **hedging cost** in a noisy and uncertain market environment
 
 Rather than optimizing for raw PnL - which is dominated by mark-to-market noise - the focus is on **controlled PnL** and **robust decision-making across many market simulations.**
 
@@ -26,7 +26,7 @@ The core question I try to answer is:
 ### Quoting
 
 - Spread is proportional to estimated volatility
-- Quotes are skewed are linearly with inventory
+- Quotes are skewed linearly with inventory
 ```ini
 skew = −α × inventory
 ```
@@ -36,7 +36,7 @@ skew = −α × inventory
 - Inventory is hedged externally when it exceeds a volatility-scaled threshold
 - Hedge execution includes fixed slippage and linear market impact
 
-Hedging decisions are solely driven by inventory risk; execution costs are accounted for ex-post rather than used as decision constraints
+Hedging decisions are driven solely by inventory risk; execution costs are accounted for ex-post rather than used as decision constraints.
 
 ## PnL Decomposition
 
@@ -45,7 +45,7 @@ Total PnL is decomposed as:
 Total_PnL = Controlled_PnL + Mark-to-Market_Noise
 ```
 where:
-- Controlled_PnL = spread revenue - headge cost
+- Controlled_PnL = spread revenue - hedge cost
 - Mark-to-Market_Noise = inventory x price movement
 
 Only **controlled PnL** is used for optimization and evaluation, since MTM dominates variance and is not directly controllable by the strategy.
@@ -66,7 +66,7 @@ A parameter set is considered statistically meaningful only if:
 t-stat ≥ 2
 ```
 
-Out of sample validation is performed by re-evaluating statistically singnificant parameter regimes on unseen random seeds
+Out of sample validation is performed by re-evaluating statistically significant parameter regimes on unseen random seeds.
 
 ## Optimization Perspective
 
@@ -78,31 +78,37 @@ This reflects the reality of market making which involves choosing a position on
 
 ## Baseline Comparison
 
-A simple baseline strategy is included with:
-- fixed spread
-- no inventory skew
-- static hedging threshold
+During development, exploratory comparisons were conducted against a simple baseline strategy with fixed spreads, no inventory skwe, and static hedging thresholds (see `research` branch).
 
-Optimized startegies consistently outperform the baseling on controlled PnL while maintaining comparable inventory risk.
+These comparisons helped sanity-check results but are not included in the main evaluation pipeline to keep the core model minimal.
 
-For reference, exploratory comparisons against simple baselines were conducted during development (see `research` branch)
+## Calibration Notes
+
+The model is calibrated to a 10-minute time scale using realistic equity-market magnitudes:
+- annualized volatility ≈ 15–25%
+- bid-ask spreads on the order of a few basis points
+- moderate order arrival rates per interval
+
+This calibration avoids microstructure-level noise while keeping inventory and execution dynamics interpretable.
 
 ## Results
 
-The figure below shows the out-of-sample tradeoff between controlled PnL and inventory risk for statistically significant parameter sets (t-stat ≥ 2).
+Out-of-sample results at a 10-minute resolution show a smooth tradeoff between controlled PnL and inventory risk. Allowing moderately higher inventory exposure increases expected spread capture, but gains are incremental rather than explosive, reflecting the thin margins of market making under realistic execution costs.
 
-The Pareto frontier highlights a robust region of strategies that achieve higher spread capture at the cost of increased inventory exposure.
+Absolute PnL magnitudes are intentionally small, reflecting a single unlevered instrument; market-making profitability arises from scaling small per-trade edges rather than large standaline returns.
+
+The figure below shows the out-of-sample tradeoff between controlled PnL and inventory risk for statistically significant parameter sets (t-stat ≥ 2). The Pareto frontier highlights a robust region of strategies that achieve higher spread capture at the cost of increased inventory exposure.
 
 ![OOS Pareto Frontier](figures/pareto_oos.png)
 
-Across the parameter space explored, only a subset (~10–15%) of configurations produced controlled PnL that was statistically distinguishable from noise. These configurations formed a conherent region rather than isolated optima, suggesting a genuine structural tradeoff rather than overfitting.
+Across the parameter space explored, a substantial fraction of configurations exhibited statistically significant controlled PnL in-sample. However only a smaller subset (~30-40%) remained stable out-of-sample, forming a coherent tradeoff region rather than isolated optima.
 
 ## Key Findings
 
 - Raw PnL is extremely noisy and misleading for optimization
 - Controlled PnL reveals stable and repeatable structure
-- Only a subset of parameter space (~10%) produces statistically significant performance
-- Volatility adaptive hedging materially reduces tail inventory exposure
+- Only a subset of parameter space (~40%) produces statistically significant performance
+- Volatility-aware inventory control materially reduces tail inventory exposure
 
 ## Limitations
 

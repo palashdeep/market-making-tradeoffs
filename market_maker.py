@@ -8,7 +8,7 @@ class MarketMaker():
     - volatility-scaled inventory hedging
     """
 
-    def __init__(self, lam=0.94, sigma=0.2, slippage=0.005, impact=0.001, max_shift=0.2):
+    def __init__(self, lam=0.9, sigma=0.2, slippage=0.005, impact=0.001, max_shift=0.2):
         # Volatility estimation
         self.lam = lam       
         self.sigma_ref = sigma 

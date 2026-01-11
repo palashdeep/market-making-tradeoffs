@@ -7,10 +7,10 @@ def main():
 
     param_grid = [
         (k, alpha, hth, hsz)
-        for k in [0.5, 1.0, 2.0]
-        for alpha in [0.0, 0.001, 0.005]
+        for k in [0.5, 1.0, 1.5]
+        for alpha in [0.0, 0.01, 0.05]
         for hth in [20, 50, 100]
-        for hsz in [5, 10, 20]
+        for hsz in [10, 20, 50]
     ]
 
     seeds = range(1,51)
