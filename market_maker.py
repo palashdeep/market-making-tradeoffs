@@ -8,7 +8,7 @@ class MarketMaker():
     - volatility-scaled inventory hedging
     """
 
-    def __init__(self, lam=0.94, sigma=0.2, slippage=0.01, impact=0.0005, max_shift=2.0):
+    def __init__(self, lam=0.94, sigma=0.2, slippage=0.005, impact=0.001, max_shift=0.2):
         # Volatility estimation
         self.lam = lam       
         self.sigma_ref = sigma 
@@ -31,19 +31,19 @@ class MarketMaker():
         self.sigma2_ewma = self.lam * self.sigma2_ewma + (1 - self.lam) * (ret**2)
         return np.sqrt(self.sigma2_ewma)
     
-    def quote(self, mid, k, inv, alpha):
+    def quote(self, mid, k, inv, alpha, dt):
         """
         Returns bid/ask quotes
         Spread depends on volatility; skew depends on inventory
         """
 
         sigma_ewma = np.sqrt(self.sigma2_ewma)
-        spread = k * sigma_ewma
+        spread = k * sigma_ewma * np.sqrt(dt)
 
         skew = np.clip(-alpha * inv, -self.max_shift, self.max_shift)
         
-        bid = mid - spread/2 + skew
-        ask = mid + spread/2 + skew
+        bid = mid * (1 - spread/2) + skew
+        ask = mid * (1 + spread/2) + skew
         return bid, ask
 
     def execute_trade(self, side, price, size, inv, cash, mid):
@@ -60,7 +60,7 @@ class MarketMaker():
             inv += size
             self.spread_revenue += (mid - price) * size
         
-        return inv, cash
+        return cash, inv
     
     def hedge(self, mid, inv, cash, base_threshold, hedge_size):
         """Volatility-scaled inventory hedging"""
@@ -76,7 +76,7 @@ class MarketMaker():
             inv += units
             self.hedge_cost += abs(exec_price - mid) * abs(units)
 
-        return inv, cash
+        return cash, inv
 
     def controlled_PnL(self):
         """spread revenue minus hedge cost"""

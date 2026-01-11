@@ -87,6 +87,16 @@ Optimized startegies consistently outperform the baseling on controlled PnL whil
 
 For reference, exploratory comparisons against simple baselines were conducted during development (see `research` branch)
 
+## Results
+
+The figure below shows the out-of-sample tradeoff between controlled PnL and inventory risk for statistically significant parameter sets (t-stat ≥ 2).
+
+The Pareto frontier highlights a robust region of strategies that achieve higher spread capture at the cost of increased inventory exposure.
+
+![OOS Pareto Frontier](figures/pareto_oos.png)
+
+Across the parameter space explored, only a subset (~10–15%) of configurations produced controlled PnL that was statistically distinguishable from noise. These configurations formed a conherent region rather than isolated optima, suggesting a genuine structural tradeoff rather than overfitting.
+
 ## Key Findings
 
 - Raw PnL is extremely noisy and misleading for optimization

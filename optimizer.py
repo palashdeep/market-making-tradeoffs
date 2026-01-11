@@ -27,6 +27,7 @@ def evaluate_params(params, all_data):
 
     controlled_pnls = np.array(controlled_pnls)
     inv_vols = np.array(inv_vols)
+    hedge_costs = np.array(hedge_costs)
 
     t_stat = np.mean(controlled_pnls) / (np.std(controlled_pnls, ddof=1) / np.sqrt(len(all_data)))
 

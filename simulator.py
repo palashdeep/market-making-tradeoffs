@@ -1,7 +1,7 @@
 import numpy as np
 from market_maker import MarketMaker
 
-def generate_data(T=5000, seed=36, sigma=0.2, mu=0.0, S0=100, steps_per_year=25200):
+def generate_data(T=5000, seed=36, sigma=0.2, mu=0.0, S0=100, steps_per_year=10000): # 10 minute intervals
     """
     Simulate price path using geometric Brownian motion.
     sigma, mu are annualized.
@@ -18,7 +18,7 @@ def generate_data(T=5000, seed=36, sigma=0.2, mu=0.0, S0=100, steps_per_year=252
     
     return S
 
-def simulate_path(prices, mm: MarketMaker, k, alpha, hedge_threshold, hedge_size, order_prob = 0.5, max_order_size = 5, seed=None):
+def simulate_path(prices, mm: MarketMaker, k, alpha, hedge_threshold, hedge_size, order_prob = 0.2, max_order_size = 5, steps_per_year=10000, seed=None):
     """
     Simulates a single market making path
     Returns 
@@ -28,6 +28,7 @@ def simulate_path(prices, mm: MarketMaker, k, alpha, hedge_threshold, hedge_size
     - controlled PnL components
     """
     rng = np.random.default_rng(seed)
+    dt = 1.0 / steps_per_year
     
     inv, cash = 0, 0
     inv_path = [inv]
@@ -38,7 +39,17 @@ def simulate_path(prices, mm: MarketMaker, k, alpha, hedge_threshold, hedge_size
         
         #update vol estimate and quote
         mm.update_volatility(ret)
-        bid, ask = mm.quote(mid, k, inv, alpha)
+        bid, ask = mm.quote(mid, k, inv, alpha, dt)
+
+        # ask_dist = ask - mid
+        # bid_dist = mid - bid
+
+        # p_buy  = np.exp(-ask_dist)
+        # p_sell = np.exp(-bid_dist)
+
+        # norm = p_buy + p_sell
+        # p_buy /= norm
+        # p_sell /= norm
 
         if rng.random() < order_prob:
             side = rng.choice(["buy", "sell"])
